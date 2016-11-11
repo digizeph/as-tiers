@@ -6,6 +6,16 @@ import java.util.*;
  */
 public class AsTiers {
 
+    public static void main(String[] args) {
+        if (args.length != 2) {
+            System.err.println("USAGE: java -jar astiers INPUTFILE OUTPUTFILE");
+            return;
+        }
+        AsTiers astiers = new AsTiers();
+        List<Set<String>> tiers = astiers.learnTiers(args[0]);
+        astiers.writeTiers(args[1], tiers);
+    }
+
     List<Set<String>> learnTiers(String filename) {
         List<Set<String>> tiers = new ArrayList<>();
         Map<String, ArrayList<Integer>> peerProviderCount = new HashMap<>();
@@ -25,7 +35,7 @@ public class AsTiers {
                     continue;
                 }
                 String[] lst;
-                if(line.contains("\\|"))
+                if (line.contains("|"))
                     lst = line.split("\\|");
                 else
                     lst = line.split(" ");
@@ -82,7 +92,6 @@ public class AsTiers {
         return tiers;
     }
 
-
     void writeTiers(String filename, List<Set<String>> tiers){
 
         if (tiers==null){
@@ -106,15 +115,5 @@ public class AsTiers {
             e.printStackTrace();
         }
 
-    }
-
-    public static void main(String[] args) {
-        if(args.length!=2){
-            System.err.println("USAGE: java -jar astiers INPUTFILE OUTPUTFILE");
-            return;
-        }
-        AsTiers astiers = new AsTiers();
-        List<Set<String>> tiers = astiers.learnTiers(args[0]);
-        astiers.writeTiers(args[1],tiers);
     }
 }
