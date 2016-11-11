@@ -1,8 +1,4 @@
-import bgpi.utils.io.FileOp;
-import bgpi.utils.io.Output;
-
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -10,17 +6,29 @@ import java.util.*;
  */
 public class AsTiers {
 
-    List<Set<String>> learnTiers(String folder, String filename) {
+    List<Set<String>> learnTiers(String filename) {
         List<Set<String>> tiers = new ArrayList<>();
         Map<String, ArrayList<Integer>> peerProviderCount = new HashMap<>();
-        BufferedReader bi = FileOp.getBufferedReader(folder, filename);
+        BufferedReader bi = null;
+
+        try {
+            FileReader fr = new FileReader(filename);
+            bi = new BufferedReader(fr);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
         String line;
         try {
             while ((line = bi.readLine()) != null) {
                 if (line.contains("#")) {
                     continue;
                 }
-                String[] lst = line.split("\\|");
+                String[] lst;
+                if(line.contains("\\|"))
+                    lst = line.split("\\|");
+                else
+                    lst = line.split(" ");
                 if (!peerProviderCount.containsKey(lst[0])) {
                     ArrayList<Integer> list = new ArrayList<>();
                     list.add(0);
@@ -70,7 +78,43 @@ public class AsTiers {
             }
         }
 
-        Output.pl("tier1: %d; tier2: %d; tier3: %d", tiers.get(0).size(), tiers.get(1).size(), tiers.get(2).size());
+        System.out.printf("tier1: %d; tier2: %d; tier3: %d\n", tiers.get(0).size(), tiers.get(1).size(), tiers.get(2).size());
         return tiers;
+    }
+
+
+    void writeTiers(String filename, List<Set<String>> tiers){
+
+        if (tiers==null){
+            return;
+        }
+
+
+        try {
+            // create output file if not exists.
+            File f = new File(filename);
+            FileWriter fw = new FileWriter(f);
+            BufferedWriter bw = new BufferedWriter(fw);
+
+            for(int i=0;i<tiers.size();i++){
+                for(String asn: tiers.get(i)){
+                        bw.write(String.format("%d:%s\n",i+1,asn));
+                }
+            }
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void main(String[] args) {
+        if(args.length!=2){
+            System.err.println("USAGE: java -jar astiers INPUTFILE OUTPUTFILE");
+            return;
+        }
+        AsTiers astiers = new AsTiers();
+        List<Set<String>> tiers = astiers.learnTiers(args[0]);
+        astiers.writeTiers(args[1],tiers);
     }
 }
