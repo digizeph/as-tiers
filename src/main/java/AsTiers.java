@@ -26,7 +26,7 @@ public class AsTiers {
      * @param filename path file name.
      * @return list of sets with 3 items: tier 1 ASes, tier 2 ASes, tier 3 ASes.
      */
-    private List<Set<String>> learnTiers(String filename) {
+    public List<Set<String>> learnTiers(String filename) {
         List<Set<String>> tiers = new ArrayList<>();    // tiers
         Map<String, ArrayList<Integer>> peerCustomerProviderCount = new HashMap<>();    // number of peers, and number of providers
         BufferedReader bi;
@@ -104,8 +104,9 @@ public class AsTiers {
             if (pair.get(1) > 0 && pair.get(2) == 0) {
                 // has customer, no providers
                 tiers.get(0).add(asn);
-            } else if (pair.get(1) == 0 && pair.get(2) > 0) {
-                // only providers, no customers --> tier 3
+            } else if (pair.get(0) == 0 && pair.get(1) == 0 && pair.get(2) > 0) {
+                //} else if (pair.get(1) == 0 && pair.get(2) > 0) {
+                // only providers, no customers, no peers --> tier 3
                 tiers.get(2).add(asn);
             } else {
                 // hybrid of both
